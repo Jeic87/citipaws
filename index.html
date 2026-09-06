@@ -257,6 +257,8 @@ section.tool{ margin-bottom:64px; }
   #doc::before{ display:none; }
 }
 </style>
+<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+<script defer data-domain="citypaws.store" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
 
@@ -399,13 +401,13 @@ section.tool{ margin-bottom:64px; }
 
           <div class="doc-foot">Documento generado con citypaws.store para acompañar una solicitud de alquiler.</div>
         </div>
-        <button class="print-btn" onclick="window.print()">Imprimir / guardar como PDF</button>
+        <button class="print-btn" onclick="window.print(); if(window.plausible)plausible('expediente_pdf');">Imprimir / guardar como PDF</button>
 
         <div class="save-card">
           <h3>¿Quieres guardar tu expediente?</h3>
           <p>Estamos preparando una versión que te permitirá guardar, editar y reutilizar tu expediente cuando busques vivienda.</p>
-          <form class="save-form" onsubmit="event.preventDefault(); const e=document.getElementById('save-email').value.trim(); if(!e)return; window.location.href='mailto:cardena00@gmail.com?subject=' + encodeURIComponent('Quiero guardar mi expediente - citypaws') + '&body=' + encodeURIComponent('Mi email: ' + e); document.getElementById('save-confirm').style.display='block'; this.reset();">
-            <input type="email" id="save-email" placeholder="tu@email.com" required>
+          <form class="save-form" onsubmit="event.preventDefault(); const e=document.getElementById('save-email').value.trim(); if(!e)return; if(window.plausible)plausible('email_attempt'); window.location.href='mailto:cardena00@gmail.com?subject=' + encodeURIComponent('Quiero guardar mi expediente - citypaws') + '&body=' + encodeURIComponent('Mi email: ' + e); document.getElementById('save-confirm').style.display='block'; this.reset();">
+            <input type="email" id="save-email" placeholder="tu@email.com" required onfocus="if(window.plausible && !window.__saveInterestSent){window.__saveInterestSent=true; plausible('save_interest');}">
             <button type="submit">Déjame tu email →</button>
           </form>
           <div class="save-note" id="save-confirm" style="display:none;">Se abrirá tu app de correo para confirmar el envío. ¡Gracias!</div>
@@ -514,6 +516,34 @@ document.querySelectorAll('.city-tab').forEach(tab=>{
     document.getElementById('links-barcelona').style.display = tab.dataset.city==='barcelona' ? 'grid' : 'none';
   });
 });
+
+/* --- Plausible analytics events --- */
+if(window.plausible){
+  document.querySelectorAll('a.go').forEach(a=>{
+    a.addEventListener('click', ()=>{
+      const portal = a.closest('.link-card')?.querySelector('.portal')?.textContent?.trim().toLowerCase() || 'unknown';
+      plausible('outbound_search', {props:{portal}});
+    });
+  });
+  const tool1El = document.getElementById('tool1');
+  if(tool1El && 'IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          plausible('expediente_start');
+          io.disconnect();
+        }
+      });
+    }, {threshold:0.3});
+    io.observe(tool1El);
+  }
+  let __expedienteCompleteSent = false;
+  document.querySelectorAll('#tool1 input, #tool1 select, #tool1 textarea').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      if(!__expedienteCompleteSent){ __expedienteCompleteSent = true; plausible('expediente_complete'); }
+    });
+  });
+}
 </script>
 </body>
 </html>
