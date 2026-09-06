@@ -525,7 +525,7 @@ if(window.plausible){
       plausible('outbound_search', {props:{portal}});
     });
   });
-  const tool1El = document.getElementById('tool1');
+  const tool1El = document.querySelector('#tool1 .tool-head') || document.getElementById('tool1');
   if(tool1El && 'IntersectionObserver' in window){
     const io = new IntersectionObserver((entries)=>{
       entries.forEach(entry=>{
@@ -534,7 +534,7 @@ if(window.plausible){
           io.disconnect();
         }
       });
-    }, {threshold:0.3});
+    }, {threshold:0.1});
     io.observe(tool1El);
   }
   let __expedienteCompleteSent = false;
