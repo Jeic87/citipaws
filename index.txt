@@ -1,4 +1,4 @@
-<title>Citipaws</title>
+<title>Citypaws</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -188,13 +188,13 @@ section.tool{ margin-bottom:64px; }
 <div class="wrap">
 
   <header class="top">
-    <div class="brand"><span class="mark">🐾</span><h1>citipaws</h1></div>
+    <div class="brand"><span class="mark">🐾</span><h1>citypaws</h1></div>
     <div class="tag">Alquilar con mascota, sin dramas</div>
   </header>
 
   <div class="intro">
     <span class="eyebrow">Herramienta gratuita</span>
-    <p><strong>El 90% de los pisos en alquiler no admiten mascotas.</strong> Citipaws te ayuda con las dos cosas que realmente cambian eso: un expediente que genera confianza en el propietario, y acceso directo a los pisos que sí las admiten.</p>
+    <p><strong>El 90% de los pisos en alquiler no admiten mascotas.</strong> Citypaws te ayuda con las dos cosas que realmente cambian eso: un expediente que genera confianza en el propietario, y acceso directo a los pisos que sí las admiten.</p>
   </div>
 
   <!-- TOOL 1 -->
@@ -313,7 +313,7 @@ section.tool{ margin-bottom:64px; }
             </dl>
           </div>
 
-          <div class="doc-foot">Documento generado con citipaws.store para acompañar una solicitud de alquiler.</div>
+          <div class="doc-foot">Documento generado con citypaws.store para acompañar una solicitud de alquiler.</div>
         </div>
         <button class="print-btn" onclick="window.print()">Imprimir / guardar como PDF</button>
       </div>
@@ -326,7 +326,7 @@ section.tool{ margin-bottom:64px; }
       <span class="tool-num">02</span>
       <h2>Buscador centralizado pet-friendly</h2>
     </div>
-    <p class="tool-desc">En vez de repetir el filtro "admite mascotas" en cada portal, citipaws reúne los enlaces ya filtrados por ciudad. Estos abren búsquedas reales.</p>
+    <p class="tool-desc">En vez de repetir el filtro "admite mascotas" en cada portal, citypaws reúne los enlaces ya filtrados por ciudad. Estos abren búsquedas reales.</p>
 
     <div class="city-tabs" role="tablist">
       <button class="city-tab" data-city="madrid" aria-selected="true">Madrid</button>
@@ -363,7 +363,7 @@ section.tool{ margin-bottom:64px; }
 
   <div class="disclaimer">
     <span class="mark">🐾</span>
-    <span>citipaws no guarda ni envía tus datos: el expediente se genera entero en tu navegador. Los enlaces del buscador llevan directamente a cada portal.</span>
+    <span>citypaws no guarda ni envía tus datos: el expediente se genera entero en tu navegador. Los enlaces del buscador llevan directamente a cada portal.</span>
   </div>
 
 </div>
@@ -412,4 +412,3 @@ document.querySelectorAll('.city-tab').forEach(tab=>{
   });
 });
 </script>
-
