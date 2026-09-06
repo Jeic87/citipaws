@@ -1,0 +1,415 @@
+<title>Citipaws</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --paper:#EDEAE1;
+  --paper-raised:#F8F6F0;
+  --ink:#1C2126;
+  --muted:#6B665C;
+  --line:#D9D3C4;
+  --stamp:#A23C33;
+  --collar:#B9812A;
+  --collar-soft:#F1E4C8;
+  --focus:#2B5C6B;
+  --shadow: 0 1px 2px rgba(28,33,38,.06), 0 6px 16px rgba(28,33,38,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1A1C1B;
+    --paper-raised:#232522;
+    --ink:#EAE6DC;
+    --muted:#A79E8E;
+    --line:#38392f;
+    --stamp:#E07A6E;
+    --collar:#E3AE58;
+    --collar-soft:#3A3121;
+    --focus:#7FB6C6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1A1C1B;
+  --paper-raised:#232522;
+  --ink:#EAE6DC;
+  --muted:#A79E8E;
+  --line:#38392f;
+  --stamp:#E07A6E;
+  --collar:#E3AE58;
+  --collar-soft:#3A3121;
+  --focus:#7FB6C6;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Work Sans', ui-sans-serif, system-ui, sans-serif;
+  line-height:1.5;
+}
+h1,h2,h3{ font-family:'Fraunces', Georgia, serif; text-wrap:balance; margin:0; }
+.mono{ font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace; }
+a{ color:inherit; }
+
+.wrap{ max-width:1080px; margin:0 auto; padding:0 24px 96px; }
+
+/* header */
+.top{
+  display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+  padding:28px 0 22px; border-bottom:1px solid var(--line); margin-bottom:36px;
+  flex-wrap:wrap;
+}
+.brand{ display:flex; align-items:baseline; gap:10px; }
+.brand .mark{ font-size:1.5rem; }
+.brand h1{ font-size:1.5rem; font-weight:600; letter-spacing:-0.01em; }
+.top .tag{ color:var(--muted); font-size:.92rem; max-width:32ch; }
+
+.intro{ margin-bottom:56px; max-width:70ch; }
+.eyebrow{
+  font-family:'IBM Plex Mono'; font-size:.72rem; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--stamp); margin-bottom:10px; display:block;
+}
+.intro p{ color:var(--muted); font-size:1.02rem; margin:10px 0 0; }
+.intro p strong{ color:var(--ink); font-weight:600; }
+
+section.tool{ margin-bottom:64px; }
+.tool-head{ margin-bottom:22px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+.tool-head h2{ font-size:1.55rem; }
+.tool-num{ font-family:'IBM Plex Mono'; color:var(--muted); font-size:.85rem; }
+.tool-desc{ color:var(--muted); max-width:62ch; margin:8px 0 26px; }
+
+/* TOOL 1: form + document */
+.tool1-grid{ display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start; }
+@media (max-width:860px){ .tool1-grid{ grid-template-columns:1fr; } }
+
+.card{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:10px;
+  box-shadow:var(--shadow);
+}
+.form-card{ padding:24px; }
+.field{ margin-bottom:16px; }
+.field label{
+  display:block; font-family:'IBM Plex Mono'; font-size:.72rem; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:6px;
+}
+.field input[type=text], .field select, .field textarea{
+  width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:6px;
+  background:var(--paper); color:var(--ink); font:inherit; font-size:.94rem;
+}
+.field textarea{ resize:vertical; min-height:56px; font-family:inherit; }
+.field input:focus, .field select:focus, .field textarea:focus{
+  outline:2px solid var(--focus); outline-offset:1px;
+}
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.checks{ display:flex; flex-direction:column; gap:8px; }
+.checks label{
+  display:flex; align-items:center; gap:9px; font-size:.9rem; color:var(--ink);
+  text-transform:none; font-family:'Work Sans'; letter-spacing:0;
+}
+.checks input{ width:16px; height:16px; accent-color:var(--stamp); }
+
+/* generated document */
+.doc-wrap{ position:sticky; top:16px; }
+.doc{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:10px;
+  box-shadow:var(--shadow); padding:30px 28px; position:relative; overflow:hidden;
+}
+.doc::before{
+  content:""; position:absolute; inset:8px; border:1px solid var(--line); border-radius:6px;
+  pointer-events:none;
+}
+.doc-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:18px; }
+.doc-title{ font-family:'IBM Plex Mono'; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.doc-petname{ font-size:1.5rem; margin-top:4px; }
+.doc-sub{ color:var(--muted); font-size:.9rem; margin-top:2px; }
+.stamp{
+  font-family:'IBM Plex Mono'; font-size:.62rem; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--stamp); border:1.5px solid var(--stamp); border-radius:999px; padding:6px 12px;
+  transform:rotate(3deg); white-space:nowrap;
+}
+.doc-section{ margin-top:18px; padding-top:16px; border-top:1px dashed var(--line); }
+.doc-section h4{
+  font-family:'IBM Plex Mono'; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); margin:0 0 10px;
+}
+.kv{ display:grid; grid-template-columns:auto 1fr; gap:5px 14px; font-size:.92rem; }
+.kv dt{ color:var(--muted); }
+.kv dd{ margin:0; }
+.doc-traits{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.doc-traits li{ font-size:.9rem; display:flex; gap:8px; }
+.doc-traits li::before{ content:"✓"; color:var(--collar); font-weight:600; }
+.doc-history{ font-size:.9rem; color:var(--ink); margin-top:10px; }
+.doc-foot{ margin-top:22px; padding-top:14px; border-top:1px solid var(--line); font-size:.78rem; color:var(--muted); }
+
+.print-btn{
+  margin-top:16px; width:100%; padding:11px; border-radius:7px; border:1px solid var(--ink);
+  background:var(--ink); color:var(--paper); font:inherit; font-weight:500; font-size:.92rem;
+  cursor:pointer;
+}
+.print-btn:hover{ opacity:.88; }
+
+/* TOOL 2 */
+.city-tabs{ display:flex; gap:8px; margin-bottom:22px; }
+.city-tab{
+  font:inherit; font-size:.88rem; padding:8px 16px; border-radius:999px; border:1px solid var(--line);
+  background:var(--paper-raised); color:var(--muted); cursor:pointer;
+}
+.city-tab[aria-selected="true"]{ border-color:var(--stamp); color:var(--stamp); background:var(--collar-soft); }
+
+.link-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px; }
+.link-card{
+  padding:20px; display:flex; flex-direction:column; gap:10px;
+}
+.link-card .portal{ font-size:1.05rem; font-weight:600; }
+.link-card p{ margin:0; color:var(--muted); font-size:.88rem; flex:1; }
+.link-card a.go{
+  align-self:flex-start; font-family:'IBM Plex Mono'; font-size:.78rem; letter-spacing:.03em;
+  color:var(--stamp); text-decoration:none; border-bottom:1px solid var(--stamp); padding-bottom:1px;
+}
+.link-card a.go:hover{ opacity:.75; }
+.city-note{ grid-column:1/-1; font-size:.85rem; color:var(--muted); font-style:italic; }
+
+.disclaimer{
+  margin-top:70px; padding-top:22px; border-top:1px solid var(--line);
+  font-size:.82rem; color:var(--muted); display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
+}
+.disclaimer .mark{ color:var(--stamp); }
+
+@media print{
+  body *{ visibility:hidden; }
+  #doc, #doc *{ visibility:visible; }
+  #doc{ position:absolute; top:0; left:0; width:100%; box-shadow:none; border:none; }
+  #doc::before{ display:none; }
+}
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand"><span class="mark">🐾</span><h1>citipaws</h1></div>
+    <div class="tag">Alquilar con mascota, sin dramas</div>
+  </header>
+
+  <div class="intro">
+    <span class="eyebrow">Herramienta gratuita</span>
+    <p><strong>El 90% de los pisos en alquiler no admiten mascotas.</strong> Citipaws te ayuda con las dos cosas que realmente cambian eso: un expediente que genera confianza en el propietario, y acceso directo a los pisos que sí las admiten.</p>
+  </div>
+
+  <!-- TOOL 1 -->
+  <section class="tool" id="tool1">
+    <div class="tool-head">
+      <span class="tool-num">01</span>
+      <h2>Expediente de tu mascota</h2>
+    </div>
+    <p class="tool-desc">El inquilino rellena un formulario corto. La herramienta genera al instante un documento de una página, listo para adjuntar a la solicitud de alquiler.</p>
+
+    <div class="tool1-grid">
+      <!-- FORM -->
+      <div class="card form-card">
+        <div class="field">
+          <label for="petName">Nombre de la mascota</label>
+          <input type="text" id="petName" value="Rocco">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="species">Especie</label>
+            <select id="species">
+              <option>Perro</option><option>Gato</option><option>Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="breed">Raza / tipo</label>
+            <input type="text" id="breed" value="Mestizo, tamaño mediano">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="age">Edad</label>
+            <input type="text" id="age" value="4 años">
+          </div>
+          <div class="field">
+            <label for="weight">Peso aproximado</label>
+            <input type="text" id="weight" value="18 kg">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="neutered">Esterilizado/a</label>
+            <select id="neutered"><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field">
+            <label for="vaccines">Vacunas y desparasitación</label>
+            <select id="vaccines"><option>Al día</option><option>Pendiente</option></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Comportamiento</label>
+          <div class="checks">
+            <label><input type="checkbox" class="trait" data-text="No ladra en zonas comunes" checked> No ladra en zonas comunes</label>
+            <label><input type="checkbox" class="trait" data-text="Educado en casa: no destroza ni ensucia" checked> Educado en casa: no destroza ni ensucia</label>
+            <label><input type="checkbox" class="trait" data-text="Buena relación con niños y otros animales"> Buena relación con niños y otros animales</label>
+            <label><input type="checkbox" class="trait" data-text="Tranquilo si se queda solo varias horas" checked> Tranquilo si se queda solo varias horas</label>
+            <label><input type="checkbox" class="trait" data-text="Camina bien con correa, sin tirones"> Camina bien con correa, sin tirones</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="history">Historial de convivencia</label>
+          <textarea id="history">3 años viviendo en un piso de alquiler en Chamberí, sin incidencias ni quejas de vecinos.</textarea>
+        </div>
+        <div class="field">
+          <label for="vet">Contacto veterinario</label>
+          <input type="text" id="vet" value="Clínica San Bernardo, Madrid">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="ownerName">Nombre del inquilino</label>
+            <input type="text" id="ownerName" value="Laura Gómez">
+          </div>
+          <div class="field">
+            <label for="city">Ciudad</label>
+            <input type="text" id="city" value="Madrid">
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENT PREVIEW -->
+      <div class="doc-wrap">
+        <div class="doc" id="doc">
+          <div class="doc-head">
+            <div>
+              <div class="doc-title">Expediente de convivencia</div>
+              <div class="doc-petname" id="out-name">Rocco</div>
+              <div class="doc-sub" id="out-sub">Perro · Mestizo, tamaño mediano</div>
+            </div>
+            <div class="stamp">Apto para alquiler</div>
+          </div>
+
+          <div class="doc-section">
+            <h4>Datos básicos</h4>
+            <dl class="kv">
+              <dt>Edad</dt><dd id="out-age">4 años</dd>
+              <dt>Peso</dt><dd id="out-weight">18 kg</dd>
+              <dt>Esterilizado/a</dt><dd id="out-neutered">Sí</dd>
+              <dt>Sanidad</dt><dd id="out-vaccines">Vacunas al día</dd>
+            </dl>
+          </div>
+
+          <div class="doc-section">
+            <h4>Comportamiento</h4>
+            <ul class="doc-traits" id="out-traits"></ul>
+            <p class="doc-history" id="out-history">3 años viviendo en un piso de alquiler en Chamberí, sin incidencias ni quejas de vecinos.</p>
+          </div>
+
+          <div class="doc-section">
+            <h4>Referencias y contacto</h4>
+            <dl class="kv">
+              <dt>Veterinario</dt><dd id="out-vet">Clínica San Bernardo, Madrid</dd>
+              <dt>Inquilino</dt><dd id="out-owner">Laura Gómez</dd>
+              <dt>Ciudad</dt><dd id="out-city">Madrid</dd>
+            </dl>
+          </div>
+
+          <div class="doc-foot">Documento generado con citipaws.store para acompañar una solicitud de alquiler.</div>
+        </div>
+        <button class="print-btn" onclick="window.print()">Imprimir / guardar como PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOL 2 -->
+  <section class="tool" id="tool2">
+    <div class="tool-head">
+      <span class="tool-num">02</span>
+      <h2>Buscador centralizado pet-friendly</h2>
+    </div>
+    <p class="tool-desc">En vez de repetir el filtro "admite mascotas" en cada portal, citipaws reúne los enlaces ya filtrados por ciudad. Estos abren búsquedas reales.</p>
+
+    <div class="city-tabs" role="tablist">
+      <button class="city-tab" data-city="madrid" aria-selected="true">Madrid</button>
+      <button class="city-tab" data-city="barcelona" aria-selected="false">Barcelona</button>
+    </div>
+
+    <div class="link-grid" id="links-madrid">
+      <div class="card link-card">
+        <div class="portal">Idealista</div>
+        <p>Pisos en alquiler que admiten mascotas, filtrados para Madrid.</p>
+        <a class="go" target="_blank" rel="noopener" href="https://www.idealista.com/en/alquiler-viviendas/madrid-madrid/con-mascotas/">Abrir búsqueda →</a>
+      </div>
+      <div class="card link-card">
+        <div class="portal">Zazume</div>
+        <p>Viviendas en alquiler de larga estancia que admiten mascotas en Madrid.</p>
+        <a class="go" target="_blank" rel="noopener" href="https://www.zazume.com/en/alquiler/viviendas/madrid/mascotas">Abrir búsqueda →</a>
+      </div>
+      <div class="card link-card">
+        <div class="portal">Airbnb</div>
+        <p>Alquileres de temporada pet-friendly en Madrid, útil como puente mientras se busca piso fijo.</p>
+        <a class="go" target="_blank" rel="noopener" href="https://es.airbnb.com/madrid-spain/stays/pet-friendly">Abrir búsqueda →</a>
+      </div>
+    </div>
+
+    <div class="link-grid" id="links-barcelona" style="display:none;">
+      <div class="card link-card">
+        <div class="portal">Idealista</div>
+        <p>Pisos en alquiler que admiten mascotas, filtrados para la provincia de Barcelona.</p>
+        <a class="go" target="_blank" rel="noopener" href="https://www.idealista.com/en/alquiler-viviendas/barcelona-provincia/con-mascotas/">Abrir búsqueda →</a>
+      </div>
+      <p class="city-note">Más portales para Barcelona se añadirían en la versión final.</p>
+    </div>
+  </section>
+
+  <div class="disclaimer">
+    <span class="mark">🐾</span>
+    <span>citipaws no guarda ni envía tus datos: el expediente se genera entero en tu navegador. Los enlaces del buscador llevan directamente a cada portal.</span>
+  </div>
+
+</div>
+
+<script>
+function updateDoc(){
+  const val = id => document.getElementById(id).value;
+  document.getElementById('out-name').textContent = val('petName') || 'Sin nombre';
+  document.getElementById('out-sub').textContent = val('species') + ' · ' + (val('breed') || '—');
+  document.getElementById('out-age').textContent = val('age') || '—';
+  document.getElementById('out-weight').textContent = val('weight') || '—';
+  document.getElementById('out-neutered').textContent = val('neutered');
+  document.getElementById('out-vaccines').textContent = val('vaccines') === 'Al día' ? 'Vacunas al día' : 'Vacunación pendiente';
+  document.getElementById('out-history').textContent = val('history') || '—';
+  document.getElementById('out-vet').textContent = val('vet') || '—';
+  document.getElementById('out-owner').textContent = val('ownerName') || '—';
+  document.getElementById('out-city').textContent = val('city') || '—';
+
+  const traitsList = document.getElementById('out-traits');
+  traitsList.innerHTML = '';
+  document.querySelectorAll('.trait:checked').forEach(cb=>{
+    const li = document.createElement('li');
+    li.textContent = cb.dataset.text;
+    traitsList.appendChild(li);
+  });
+  if(!traitsList.children.length){
+    const li = document.createElement('li');
+    li.style.opacity = .6;
+    li.textContent = 'Sin rasgos marcados todavía';
+    li.style.listStyle = 'none';
+    traitsList.appendChild(li);
+  }
+}
+document.querySelectorAll('#tool1 input, #tool1 select, #tool1 textarea').forEach(el=>{
+  el.addEventListener('input', updateDoc);
+  el.addEventListener('change', updateDoc);
+});
+updateDoc();
+
+document.querySelectorAll('.city-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.city-tab').forEach(t=>t.setAttribute('aria-selected','false'));
+    tab.setAttribute('aria-selected','true');
+    document.getElementById('links-madrid').style.display = tab.dataset.city==='madrid' ? 'grid' : 'none';
+    document.getElementById('links-barcelona').style.display = tab.dataset.city==='barcelona' ? 'grid' : 'none';
+  });
+});
+</script>
+
