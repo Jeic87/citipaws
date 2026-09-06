@@ -106,13 +106,46 @@ a{ color:inherit; }
 .brand h1{ font-size:1.5rem; font-weight:600; letter-spacing:-0.01em; }
 .top .tag{ color:var(--muted); font-size:.92rem; max-width:32ch; }
 
-.intro{ margin-bottom:56px; max-width:70ch; }
+.intro{ margin-bottom:32px; max-width:70ch; }
 .eyebrow{
   font-family:'IBM Plex Mono'; font-size:.72rem; letter-spacing:.09em; text-transform:uppercase;
   color:var(--stamp); margin-bottom:10px; display:block;
 }
 .intro p{ color:var(--muted); font-size:1.02rem; margin:10px 0 0; }
 .intro p strong{ color:var(--ink); font-weight:600; }
+
+.cta-btn{
+  display:inline-block; margin-top:18px; padding:13px 24px; border-radius:8px;
+  background:var(--stamp); color:var(--paper-raised); text-decoration:none;
+  font-weight:600; font-size:1rem; letter-spacing:-.005em; border:1px solid var(--stamp);
+}
+.cta-btn:hover{ opacity:.88; }
+.cta-sub{ margin-top:10px; font-family:'IBM Plex Mono'; font-size:.7rem; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+
+.trust-strip{
+  display:flex; flex-wrap:wrap; gap:10px 24px; margin:0 0 56px; padding:16px 20px;
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:10px;
+}
+.trust-item{ font-size:.85rem; color:var(--muted); display:flex; align-items:center; gap:7px; white-space:nowrap; }
+.trust-icon{ font-size:.95rem; }
+
+.save-card{
+  margin-top:22px; padding:22px 24px; border-radius:10px; background:var(--collar-soft);
+  border:1px solid var(--collar); display:flex; flex-direction:column; gap:6px;
+}
+.save-card h3{ font-size:1.05rem; }
+.save-card p{ margin:0; color:var(--muted); font-size:.9rem; max-width:60ch; }
+.save-form{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+.save-form input[type="email"]{
+  flex:1; min-width:200px; padding:10px 12px; border:1px solid var(--line); border-radius:6px;
+  background:var(--paper); color:var(--ink); font:inherit; font-size:.92rem;
+}
+.save-form button{
+  padding:10px 18px; border-radius:6px; border:1px solid var(--ink); background:var(--ink);
+  color:var(--paper); font:inherit; font-weight:500; font-size:.9rem; cursor:pointer; white-space:nowrap;
+}
+.save-form button:hover{ opacity:.88; }
+.save-note{ font-size:.76rem; color:var(--muted); margin-top:2px; }
 
 section.tool{ margin-bottom:64px; }
 .tool-head{ margin-bottom:22px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
@@ -236,7 +269,16 @@ section.tool{ margin-bottom:64px; }
 
   <div class="intro">
     <span class="eyebrow">Herramienta gratuita</span>
-    <p><strong>El 90% de los pisos en alquiler no admiten mascotas.</strong> Citypaws te ayuda con las dos cosas que realmente cambian eso: un expediente que genera confianza en el propietario, y acceso directo a los pisos que sí las admiten.</p>
+    <p>Encontrar un alquiler que acepte mascotas puede ser difícil. Citypaws te ayuda con las dos cosas que realmente cambian eso: un expediente que genera confianza en el propietario, y acceso directo a los pisos que sí las admiten.</p>
+    <a class="cta-btn" href="#tool1">Crear mi Expediente gratis →</a>
+    <div class="cta-sub">Sin registro · Gratis · Se genera en tu navegador</div>
+  </div>
+
+  <div class="trust-strip">
+    <div class="trust-item"><span class="trust-icon">🐾</span> Sin registro</div>
+    <div class="trust-item"><span class="trust-icon">🔒</span> Tus datos no salen de tu dispositivo</div>
+    <div class="trust-item"><span class="trust-icon">📄</span> Tu expediente se genera al instante</div>
+    <div class="trust-item"><span class="trust-icon">🏠</span> Enlaces directos a búsquedas reales</div>
   </div>
 
   <!-- TOOL 1 -->
@@ -358,6 +400,16 @@ section.tool{ margin-bottom:64px; }
           <div class="doc-foot">Documento generado con citypaws.store para acompañar una solicitud de alquiler.</div>
         </div>
         <button class="print-btn" onclick="window.print()">Imprimir / guardar como PDF</button>
+
+        <div class="save-card">
+          <h3>¿Quieres guardar tu expediente?</h3>
+          <p>Estamos preparando una versión que te permitirá guardar, editar y reutilizar tu expediente cuando busques vivienda.</p>
+          <form class="save-form" onsubmit="event.preventDefault(); const e=document.getElementById('save-email').value.trim(); if(!e)return; window.location.href='mailto:cardena00@gmail.com?subject=' + encodeURIComponent('Quiero guardar mi expediente - citypaws') + '&body=' + encodeURIComponent('Mi email: ' + e); document.getElementById('save-confirm').style.display='block'; this.reset();">
+            <input type="email" id="save-email" placeholder="tu@email.com" required>
+            <button type="submit">Déjame tu email →</button>
+          </form>
+          <div class="save-note" id="save-confirm" style="display:none;">Se abrirá tu app de correo para confirmar el envío. ¡Gracias!</div>
+        </div>
       </div>
     </div>
   </section>
@@ -366,9 +418,9 @@ section.tool{ margin-bottom:64px; }
   <section class="tool" id="tool2">
     <div class="tool-head">
       <span class="tool-num">02</span>
-      <h2>Buscador centralizado pet-friendly</h2>
+      <h2>🏠 Encuentra alquileres que aceptan mascotas</h2>
     </div>
-    <p class="tool-desc">En vez de repetir el filtro "admite mascotas" en cada portal, citypaws reúne los enlaces ya filtrados por ciudad. Estos abren búsquedas reales.</p>
+    <p class="tool-desc">Hemos reunido búsquedas pet-friendly ya filtradas por ciudad, para que no tengas que configurar el filtro "admite mascotas" una y otra vez en cada portal.</p>
 
     <div class="city-tabs" role="tablist">
       <button class="city-tab" data-city="madrid" aria-selected="true">Madrid</button>
