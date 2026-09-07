@@ -288,6 +288,20 @@ section.tool{ margin-bottom:64px; }
   color:var(--muted); margin:26px 0 4px; padding-top:18px; border-top:1px solid var(--line);
 }
 .form-section-title:first-child{ margin-top:0; padding-top:0; border-top:none; }
+
+.expediente-progress{
+  margin-bottom:22px; padding:16px 18px; border-radius:10px; background:var(--paper-raised);
+  border:1px solid var(--line);
+}
+.expediente-progress-head{
+  display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;
+  margin-bottom:8px;
+}
+.expediente-progress-label{ font-weight:600; font-size:.95rem; }
+.expediente-progress-count{ font-size:.78rem; color:var(--muted); font-family:'IBM Plex Mono'; white-space:nowrap; }
+.expediente-progress-track{ height:8px; border-radius:999px; background:var(--line); overflow:hidden; }
+.expediente-progress-fill{ height:100%; border-radius:999px; background:var(--stamp); transition:width .25s ease; }
+.expediente-progress-msg{ margin-top:8px; font-size:.82rem; color:var(--muted); }
 </style>
 <script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
 <script defer data-domain="citypaws.store" src="https://plausible.io/js/script.js"></script>
@@ -334,6 +348,16 @@ section.tool{ margin-bottom:64px; }
     <div class="tool1-grid">
       <!-- FORM -->
       <div class="card form-card">
+        <div class="expediente-progress" id="expedienteProgress">
+          <div class="expediente-progress-head">
+            <span class="expediente-progress-label" id="expedienteProgressLabel">Tu expediente está 0% completo</span>
+            <span class="expediente-progress-count" id="expedienteProgressCount">0 de 9 campos completados</span>
+          </div>
+          <div class="expediente-progress-track">
+            <div class="expediente-progress-fill" id="expedienteProgressFill" style="width:0%;"></div>
+          </div>
+          <div class="expediente-progress-msg" id="expedienteProgressMsg">Empieza tu expediente</div>
+        </div>
         <h3 class="form-section-title">Datos básicos</h3>
         <div class="field">
           <label for="petName">Nombre de la mascota</label>
@@ -569,6 +593,7 @@ section.tool{ margin-bottom:64px; }
 
 <script>
 let petPhotoDataUrl = '';
+const PROGRESS_FIELD_IDS = ['petName','breed','age','weight','history','vet','reference','ownerName','city'];
 function updateDoc(){
   const val = id => document.getElementById(id).value;
   document.getElementById('out-name').textContent = val('petName') || 'Sin nombre';
@@ -629,6 +654,8 @@ function updateDoc(){
   if(clauseNameEl) clauseNameEl.textContent = val('petName') || 'la mascota';
   const clauseSpeciesEl = document.getElementById('clause-species');
   if(clauseSpeciesEl) clauseSpeciesEl.textContent = (val('species') || 'mascota').toLowerCase();
+
+  updateExpedienteProgress();
 }
 document.querySelectorAll('#tool1 input, #tool1 select, #tool1 textarea').forEach(el=>{
   el.addEventListener('input', updateDoc);
@@ -775,6 +802,39 @@ document.querySelectorAll('#tool1 input, #tool1 select, #tool1 textarea').forEac
 });
 
 checkSavedExpediente();
+
+/* --- Indicador de progreso del expediente --- */
+function isFieldFilled(id){
+  const el = document.getElementById(id);
+  if(!el) return false;
+  return el.value.trim() !== '' && el.value !== el.defaultValue;
+}
+function updateExpedienteProgress(){
+  const wrap = document.getElementById('expedienteProgress');
+  if(!wrap) return;
+  const hasRCEl = document.getElementById('hasRC');
+  const ids = PROGRESS_FIELD_IDS.concat(hasRCEl && hasRCEl.checked ? ['rcCompany','rcPolicy'] : []);
+  const total = ids.length;
+  const filled = ids.filter(isFieldFilled).length;
+  const pct = total ? Math.round((filled / total) * 100) : 0;
+  const label = document.getElementById('expedienteProgressLabel');
+  const count = document.getElementById('expedienteProgressCount');
+  const fill = document.getElementById('expedienteProgressFill');
+  const msg = document.getElementById('expedienteProgressMsg');
+  fill.style.width = pct + '%';
+  count.textContent = filled + ' de ' + total + ' campos completados';
+  if(pct >= 100){
+    wrap.classList.add('is-complete');
+    label.textContent = '✓ Expediente completo';
+    msg.textContent = 'Todo listo para adjuntar a tu solicitud de alquiler.';
+  } else {
+    wrap.classList.remove('is-complete');
+    label.textContent = 'Tu expediente está ' + pct + '% completo';
+    if(pct <= 30) msg.textContent = 'Empieza tu expediente';
+    else if(pct <= 70) msg.textContent = 'Vas por buen camino';
+    else msg.textContent = 'Ya casi está';
+  }
+}
 
 /* --- Tool 3: copiar cláusula --- */
 const copyClauseBtn = document.getElementById('copyClauseBtn');
