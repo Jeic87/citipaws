@@ -227,8 +227,9 @@ section.tool{ margin-bottom:64px; }
 .print-btn:hover{ opacity:.88; }
 
 /* TOOL 2 */
-.city-tabs{ display:flex; gap:8px; margin-bottom:22px; }
-.city-tab{
+.city-tabs{ display:flex; gap:8px; margin-bottom:22px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.city-tabs::-webkit-scrollbar{ display:none; }
+.city-tab{ flex-shrink:0;
   font:inherit; font-size:.88rem; padding:8px 16px; border-radius:999px; border:1px solid var(--line);
   background:var(--paper-raised); color:var(--muted); cursor:pointer;
 }
@@ -267,7 +268,8 @@ section.tool{ margin-bottom:64px; }
 }
 .saved-banner-actions{ display:flex; gap:10px; flex-wrap:wrap; }
 .saved-banner-actions button{ font:inherit; }
-.saved-banner-actions .print-btn{ background:transparent; color:var(--ink); border-color:var(--line); }
+.saved-banner-actions .ghost-btn{ margin-top:0; width:auto; padding:8px 16px; border-radius:7px; border:1px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-weight:500; font-size:.88rem; cursor:pointer; }
+.saved-banner-actions .ghost-btn:hover{ opacity:.7; }
 
 #tool3 .clause-box{
   padding:24px 26px; border-radius:10px; background:var(--paper-raised); border:1px solid var(--line);
@@ -280,6 +282,12 @@ section.tool{ margin-bottom:64px; }
 #tool3 .faq{ margin-top:34px; display:flex; flex-direction:column; gap:18px; max-width:70ch; }
 #tool3 .faq-item h4{ font-size:1rem; margin-bottom:6px; }
 #tool3 .faq-item p{ margin:0; color:var(--muted); font-size:.9rem; }
+
+.form-section-title{
+  font-family:'IBM Plex Mono'; font-size:.78rem; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--muted); margin:26px 0 4px; padding-top:18px; border-top:1px solid var(--line);
+}
+.form-section-title:first-child{ margin-top:0; padding-top:0; border-top:none; }
 </style>
 <script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
 <script defer data-domain="citypaws.store" src="https://plausible.io/js/script.js"></script>
@@ -295,7 +303,7 @@ section.tool{ margin-bottom:64px; }
 
   <div class="intro">
     <span class="eyebrow">Herramienta gratuita</span>
-    <p>Encontrar un alquiler que acepte mascotas puede ser difícil. Citypaws te ayuda con las dos cosas que realmente cambian eso: un expediente que genera confianza en el propietario, y acceso directo a los pisos que sí las admiten.</p>
+    <p>Encontrar un alquiler que acepte mascotas puede ser difícil. Citypaws te ayuda con las tres cosas que realmente cambian eso: un expediente que genera confianza en el propietario, acceso directo a los pisos que sí las admiten, y una cláusula lista para dejarlo por escrito en el contrato.</p>
     <a class="cta-btn" href="#tool1">Crear mi Expediente gratis →</a>
     <div class="cta-sub">Sin registro · Gratis · Se genera en tu navegador</div>
   </div>
@@ -319,13 +327,14 @@ section.tool{ margin-bottom:64px; }
       <span>📋 Tienes un expediente guardado en este navegador.</span>
       <div class="saved-banner-actions">
         <button type="button" id="loadSavedBtn" class="cta-btn">Cargar expediente guardado</button>
-        <button type="button" id="dismissSavedBtn" class="print-btn">Descartar</button>
+        <button type="button" id="dismissSavedBtn" class="ghost-btn">Descartar</button>
       </div>
     </div>
 
     <div class="tool1-grid">
       <!-- FORM -->
       <div class="card form-card">
+        <h3 class="form-section-title">Datos básicos</h3>
         <div class="field">
           <label for="petName">Nombre de la mascota</label>
           <input type="text" id="petName" value="Rocco">
@@ -368,6 +377,7 @@ section.tool{ margin-bottom:64px; }
           </div>
         </div>
 
+        <h3 class="form-section-title">Comportamiento y convivencia</h3>
         <div class="field">
           <label>Comportamiento</label>
           <div class="checks">
@@ -383,6 +393,7 @@ section.tool{ margin-bottom:64px; }
           <label for="history">Historial de convivencia</label>
           <textarea id="history">3 años viviendo en un piso de alquiler en Chamberí, sin incidencias ni quejas de vecinos.</textarea>
         </div>
+        <h3 class="form-section-title">Documentación y confianza</h3>
         <div class="field">
           <label for="vet">Contacto veterinario</label>
           <input type="text" id="vet" value="Clínica San Bernardo, Madrid">
@@ -487,7 +498,7 @@ section.tool{ margin-bottom:64px; }
 
         <div class="save-card">
           <h3>¿Quieres guardar tu expediente?</h3>
-          <p>Ya puedes guardarlo en este navegador con el botón de arriba — se recuperará automáticamente la próxima vez que entres desde este dispositivo. Si prefieres tener también una copia en tu email para abrirla desde otro dispositivo, déjanos tu correo:</p>
+          <p>Tu expediente se guarda automáticamente en este navegador mientras lo completas. La próxima vez que entres desde este dispositivo, te ofreceremos recuperarlo. Si prefieres tener también una copia en tu email para abrirla desde otro dispositivo, déjanos tu correo:</p>
           <form class="save-form" onsubmit="event.preventDefault(); const e=document.getElementById('save-email').value.trim(); if(!e)return; if(window.plausible)plausible('email_attempt'); window.location.href='mailto:cardena00@gmail.com?subject=' + encodeURIComponent('Quiero guardar mi expediente - citypaws') + '&body=' + encodeURIComponent('Mi email: ' + e); document.getElementById('save-confirm').style.display='block'; this.reset();">
             <input type="email" id="save-email" placeholder="tu@email.com" required onfocus="if(window.plausible && !window.__saveInterestSent){window.__saveInterestSent=true; plausible('save_interest');}">
             <button type="submit">Déjame tu email →</button>
