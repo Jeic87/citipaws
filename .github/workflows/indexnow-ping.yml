@@ -1,0 +1,18 @@
+name: IndexNow Ping
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sitemap.xml'
+      - 'index.html'
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping IndexNow (Bing / Yandex / Seznam / Naver)
+        run: |
+          curl -s -o /tmp/resp.txt -w "HTTP_STATUS:%{http_code}" \
+            "https://api.indexnow.org/indexnow?url=https://citypaws.store/&key=0b6a25a58b99c210681216a694ba4312&keyLocation=https://citypaws.store/0b6a25a58b99c210681216a694ba4312.txt" \
+          | tee /tmp/status.txt
+          cat /tmp/resp.txt || true
