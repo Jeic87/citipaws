@@ -509,6 +509,7 @@ section.tool{ margin-bottom:64px; }
 </div>
 
 <script>
+let petPhotoDataUrl = '';
 function updateDoc(){
   const val = id => document.getElementById(id).value;
   document.getElementById('out-name').textContent = val('petName') || 'Sin nombre';
@@ -561,7 +562,6 @@ document.querySelectorAll('#tool1 input, #tool1 select, #tool1 textarea').forEac
 });
 updateDoc();
 
-let petPhotoDataUrl = '';
 const PET_PHOTO_MAX_DIM = 400;
 const PET_PHOTO_MAX_UPLOAD_MB = 15;
 document.getElementById('petPhoto').addEventListener('change', function(e){
