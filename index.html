@@ -259,6 +259,27 @@ section.tool{ margin-bottom:64px; }
   #doc{ position:absolute; top:0; left:0; width:100%; box-shadow:none; border:none; }
   #doc::before{ display:none; }
 }
+
+.saved-banner{
+  margin-bottom:22px; padding:16px 20px; border-radius:10px; background:var(--collar-soft);
+  border:1px solid var(--collar); display:flex; align-items:center; justify-content:space-between;
+  gap:14px; flex-wrap:wrap; font-size:.92rem;
+}
+.saved-banner-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+.saved-banner-actions button{ font:inherit; }
+.saved-banner-actions .print-btn{ background:transparent; color:var(--ink); border-color:var(--line); }
+
+#tool3 .clause-box{
+  padding:24px 26px; border-radius:10px; background:var(--paper-raised); border:1px solid var(--line);
+  font-size:.95rem; line-height:1.6; max-width:70ch;
+}
+#tool3 .clause-box p{ margin:0 0 12px; }
+#tool3 .clause-box p:last-child{ margin-bottom:0; }
+#tool3 .clause-actions{ margin-top:16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+#tool3 .clause-copied{ font-size:.85rem; color:var(--muted); display:none; }
+#tool3 .faq{ margin-top:34px; display:flex; flex-direction:column; gap:18px; max-width:70ch; }
+#tool3 .faq-item h4{ font-size:1rem; margin-bottom:6px; }
+#tool3 .faq-item p{ margin:0; color:var(--muted); font-size:.9rem; }
 </style>
 <script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
 <script defer data-domain="citypaws.store" src="https://plausible.io/js/script.js"></script>
@@ -293,6 +314,14 @@ section.tool{ margin-bottom:64px; }
       <h2>Expediente de tu mascota</h2>
     </div>
     <p class="tool-desc">El inquilino rellena un formulario corto. La herramienta genera al instante un documento de una página, listo para adjuntar a la solicitud de alquiler.</p>
+
+    <div class="saved-banner" id="savedBanner" style="display:none;">
+      <span>📋 Tienes un expediente guardado en este navegador.</span>
+      <div class="saved-banner-actions">
+        <button type="button" id="loadSavedBtn" class="cta-btn">Cargar expediente guardado</button>
+        <button type="button" id="dismissSavedBtn" class="print-btn">Descartar</button>
+      </div>
+    </div>
 
     <div class="tool1-grid">
       <!-- FORM -->
@@ -377,6 +406,19 @@ section.tool{ margin-bottom:64px; }
             </div>
           </div>
         </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="training">Certificado de adiestramiento (opcional)</label>
+            <input type="text" id="training" placeholder="Ej: adiestrador canino certificado, 2023" value="">
+          </div>
+          <div class="field">
+            <div class="checks">
+              <label><input type="checkbox" id="hasCartilla" checked> Cartilla de vacunación disponible para mostrar</label>
+            </div>
+          </div>
+        </div>
+
         <div class="row2">
           <div class="field">
             <label for="ownerName">Nombre del inquilino</label>
@@ -404,7 +446,10 @@ section.tool{ margin-bottom:64px; }
                 <div class="doc-sub" id="out-sub">Perro · Mestizo, tamaño mediano</div>
               </div>
             </div>
-            <div class="stamp">Apto para alquiler</div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+              <div class="stamp">Apto para alquiler</div>
+              <div class="stamp" id="out-verified-stamp" style="display:none; font-size:.7rem;">Referencias verificables</div>
+            </div>
           </div>
 
           <div class="doc-section">
@@ -431,6 +476,8 @@ section.tool{ margin-bottom:64px; }
               <dt>Inquilino</dt><dd id="out-owner">Laura Gómez</dd>
               <dt>Ciudad</dt><dd id="out-city">Madrid</dd>
               <dt>Referencia anterior</dt><dd id="out-reference">—</dd>
+              <dt>Cartilla vacunación</dt><dd id="out-cartilla">—</dd>
+              <dt>Adiestramiento</dt><dd id="out-training">—</dd>
             </dl>
           </div>
 
@@ -440,7 +487,7 @@ section.tool{ margin-bottom:64px; }
 
         <div class="save-card">
           <h3>¿Quieres guardar tu expediente?</h3>
-          <p>Estamos preparando una versión que te permitirá guardar, editar y reutilizar tu expediente cuando busques vivienda.</p>
+          <p>Ya puedes guardarlo en este navegador con el botón de arriba — se recuperará automáticamente la próxima vez que entres desde este dispositivo. Si prefieres tener también una copia en tu email para abrirla desde otro dispositivo, déjanos tu correo:</p>
           <form class="save-form" onsubmit="event.preventDefault(); const e=document.getElementById('save-email').value.trim(); if(!e)return; if(window.plausible)plausible('email_attempt'); window.location.href='mailto:cardena00@gmail.com?subject=' + encodeURIComponent('Quiero guardar mi expediente - citypaws') + '&body=' + encodeURIComponent('Mi email: ' + e); document.getElementById('save-confirm').style.display='block'; this.reset();">
             <input type="email" id="save-email" placeholder="tu@email.com" required onfocus="if(window.plausible && !window.__saveInterestSent){window.__saveInterestSent=true; plausible('save_interest');}">
             <button type="submit">Déjame tu email →</button>
@@ -459,44 +506,45 @@ section.tool{ margin-bottom:64px; }
     </div>
     <p class="tool-desc">Hemos reunido búsquedas pet-friendly ya filtradas por ciudad, para que no tengas que configurar el filtro "admite mascotas" una y otra vez en cada portal.</p>
 
-    <div class="city-tabs" role="tablist">
-      <button class="city-tab" data-city="madrid" aria-selected="true">Madrid</button>
-      <button class="city-tab" data-city="barcelona" aria-selected="false">Barcelona</button>
+    <div class="city-tabs" role="tablist" id="city-tabs"></div>
+
+    <div class="link-grid" id="city-links"></div>
+  </section>
+
+  <!-- TOOL 3 -->
+  <section class="tool" id="tool3">
+    <div class="tool-head">
+      <span class="tool-num">03</span>
+      <h2>📄 Cláusula de mascota para el contrato</h2>
+    </div>
+    <p class="tool-desc">Una cláusula de convivencia con mascota, redactada según la Ley de Arrendamientos Urbanos y la Ley 7/2023 de bienestar animal, lista para copiar y pegar en el contrato de alquiler.</p>
+
+    <div class="clause-box" id="clause-text">
+      <p>El arrendatario declara ser propietario/a de una mascota de la especie <strong><span id="clause-species">perro</span></strong>, de nombre <strong><span id="clause-name">la mascota</span></strong>, cuya tenencia queda expresamente autorizada por el arrendador para el uso de la vivienda arrendada, en los términos del artículo 27.2.e) del Real Decreto 1/2013 y de la Ley 7/2023, de 28 de marzo, de protección de los derechos y el bienestar de los animales.</p>
+      <p>El arrendatario se compromete a: (a) mantener al animal en condiciones adecuadas de higiene y bienestar; (b) responder de los daños que la mascota pudiera ocasionar en la vivienda, más allá del desgaste por uso normal; (c) evitar molestias a la comunidad de vecinos derivadas de ruidos u olores; y (d) contar con el seguro de responsabilidad civil exigido por la normativa autonómica aplicable, cuando corresponda.</p>
+      <p>La presente cláusula no altera el resto de condiciones pactadas en el contrato de arrendamiento, y se incorpora como anexo al mismo con la firma de ambas partes.</p>
+    </div>
+    <div class="clause-actions">
+      <button type="button" class="cta-btn" id="copyClauseBtn">Copiar cláusula</button>
+      <span class="clause-copied" id="clauseCopiedMsg">Copiado ✓</span>
     </div>
 
-    <div class="link-grid" id="links-madrid">
-      <div class="card link-card">
-        <div class="portal">Idealista</div>
-        <p>Pisos en alquiler que admiten mascotas, filtrados para Madrid.</p>
-        <a class="go" target="_blank" rel="noopener" href="https://www.idealista.com/en/alquiler-viviendas/madrid-madrid/con-mascotas/">Abrir búsqueda →</a>
+    <div class="faq">
+      <div class="faq-item">
+        <h4>¿Puede el propietario prohibir mascotas en el contrato?</h4>
+        <p>Sí. La ley no obliga a admitir mascotas en una vivienda de alquiler; el propietario puede pactar lo contrario en el contrato. Esta cláusula sirve para cuando ambas partes ya están de acuerdo y quieren dejarlo por escrito con claridad.</p>
       </div>
-      <div class="card link-card">
-        <div class="portal">Zazume</div>
-        <p>Viviendas en alquiler de larga estancia que admiten mascotas en Madrid.</p>
-        <a class="go" target="_blank" rel="noopener" href="https://www.zazume.com/en/alquiler/viviendas/madrid/mascotas">Abrir búsqueda →</a>
+      <div class="faq-item">
+        <h4>¿Es obligatorio el seguro de responsabilidad civil?</h4>
+        <p>Depende de la normativa autonómica y, en algunos casos, del municipio o de la raza del animal. Conviene comprobarlo antes de firmar e indicarlo en el expediente si aplica.</p>
       </div>
-      <div class="card link-card">
-        <div class="portal">Airbnb</div>
-        <p>Alquileres de temporada pet-friendly en Madrid, útil como puente mientras se busca piso fijo.</p>
-        <a class="go" target="_blank" rel="noopener" href="https://es.airbnb.com/madrid-spain/stays/pet-friendly">Abrir búsqueda →</a>
+      <div class="faq-item">
+        <h4>¿Qué pasa si el animal causa daños en la vivienda?</h4>
+        <p>El desgaste por uso normal no es responsabilidad del inquilino, pero los daños derivados del comportamiento del animal (arañazos, roturas, manchas) sí pueden descontarse de la fianza, como con cualquier otro desperfecto.</p>
       </div>
-    </div>
-
-    <div class="link-grid" id="links-barcelona" style="display:none;">
-      <div class="card link-card">
-        <div class="portal">Idealista</div>
-        <p>Pisos en alquiler que admiten mascotas, filtrados para la provincia de Barcelona.</p>
-        <a class="go" target="_blank" rel="noopener" href="https://www.idealista.com/en/alquiler-viviendas/barcelona-provincia/con-mascotas/">Abrir búsqueda →</a>
-      </div>
-      <div class="card link-card">
-        <div class="portal">Zazume</div>
-        <p>Viviendas en alquiler de larga estancia que admiten mascotas en Barcelona.</p>
-        <a class="go" target="_blank" rel="noopener" href="https://www.zazume.com/en/alquiler/viviendas/barcelona/mascotas">Abrir búsqueda →</a>
-      </div>
-      <div class="card link-card">
-        <div class="portal">Airbnb</div>
-        <p>Alquileres de temporada pet-friendly en Barcelona, útil como puente mientras se busca piso fijo.</p>
-        <a class="go" target="_blank" rel="noopener" href="https://es.airbnb.com/barcelona-spain/stays/pet-friendly">Abrir búsqueda →</a>
+      <div class="faq-item">
+        <h4>¿Esta cláusula sustituye el contrato de alquiler?</h4>
+        <p>No. Es un anexo pensado para incorporarse al contrato ya existente, no un documento independiente ni un contrato completo.</p>
       </div>
     </div>
   </section>
@@ -555,6 +603,21 @@ function updateDoc(){
     outPhoto.style.display = 'none';
     outPhotoPlaceholder.style.display = 'block';
   }
+
+  const cartillaEl = document.getElementById('hasCartilla');
+  const outCartilla = document.getElementById('out-cartilla');
+  if(outCartilla) outCartilla.textContent = cartillaEl && cartillaEl.checked ? 'Sí' : 'No indicada';
+  const outTraining = document.getElementById('out-training');
+  if(outTraining) outTraining.textContent = val('training') || 'No indicado';
+
+  const verified = !!(val('vet') && val('reference') && hasRC);
+  const verifiedStamp = document.getElementById('out-verified-stamp');
+  if(verifiedStamp) verifiedStamp.style.display = verified ? 'inline-block' : 'none';
+
+  const clauseNameEl = document.getElementById('clause-name');
+  if(clauseNameEl) clauseNameEl.textContent = val('petName') || 'la mascota';
+  const clauseSpeciesEl = document.getElementById('clause-species');
+  if(clauseSpeciesEl) clauseSpeciesEl.textContent = (val('species') || 'mascota').toLowerCase();
 }
 document.querySelectorAll('#tool1 input, #tool1 select, #tool1 textarea').forEach(el=>{
   el.addEventListener('input', updateDoc);
@@ -594,22 +657,143 @@ document.getElementById('petPhoto').addEventListener('change', function(e){
   reader.readAsDataURL(file);
 });
 
-document.querySelectorAll('.city-tab').forEach(tab=>{
-  tab.addEventListener('click', ()=>{
-    document.querySelectorAll('.city-tab').forEach(t=>t.setAttribute('aria-selected','false'));
-    tab.setAttribute('aria-selected','true');
-    document.getElementById('links-madrid').style.display = tab.dataset.city==='madrid' ? 'grid' : 'none';
-    document.getElementById('links-barcelona').style.display = tab.dataset.city==='barcelona' ? 'grid' : 'none';
-  });
+const CITIES = [
+  { id:'madrid', label:'Madrid', idealista:'madrid-madrid', idealistaLabel:'Madrid', zazume:'madrid', airbnb:'madrid-spain' },
+  { id:'barcelona', label:'Barcelona', idealista:'barcelona-provincia', idealistaLabel:'la provincia de Barcelona', zazume:'barcelona', airbnb:'barcelona-spain' },
+  { id:'valencia', label:'Valencia', idealista:'valencia-valencia', idealistaLabel:'Valencia', zazume:'valencia', airbnb:'valencia-spain' },
+  { id:'sevilla', label:'Sevilla', idealista:'sevilla-sevilla', idealistaLabel:'Sevilla', zazume:'sevilla', airbnb:'seville-spain' },
+  { id:'malaga', label:'Málaga', idealista:'malaga-malaga', idealistaLabel:'Málaga', zazume:'malaga', airbnb:'malaga-spain' }
+];
+
+function renderCityTabs(){
+  const wrap = document.getElementById('city-tabs');
+  wrap.innerHTML = CITIES.map((c,i)=>
+    '<button class="city-tab" data-city="' + c.id + '" aria-selected="' + (i===0?'true':'false') + '">' + c.label + '</button>'
+  ).join('');
+}
+
+function renderCityLinks(cityId){
+  const c = CITIES.find(x=>x.id===cityId) || CITIES[0];
+  const wrap = document.getElementById('city-links');
+  wrap.innerHTML =
+    '<div class="card link-card">' +
+      '<div class="portal">Idealista</div>' +
+      '<p>Pisos en alquiler que admiten mascotas, filtrados para ' + c.idealistaLabel + '.</p>' +
+      '<a class="go" target="_blank" rel="noopener" href="https://www.idealista.com/en/alquiler-viviendas/' + c.idealista + '/con-mascotas/">Abrir búsqueda →</a>' +
+    '</div>' +
+    '<div class="card link-card">' +
+      '<div class="portal">Zazume</div>' +
+      '<p>Viviendas en alquiler de larga estancia que admiten mascotas en ' + c.label + '.</p>' +
+      '<a class="go" target="_blank" rel="noopener" href="https://www.zazume.com/en/alquiler/viviendas/' + c.zazume + '/mascotas">Abrir búsqueda →</a>' +
+    '</div>' +
+    '<div class="card link-card">' +
+      '<div class="portal">Airbnb</div>' +
+      '<p>Alquileres de temporada pet-friendly en ' + c.label + ', útil como puente mientras se busca piso fijo.</p>' +
+      '<a class="go" target="_blank" rel="noopener" href="https://es.airbnb.com/' + c.airbnb + '/stays/pet-friendly">Abrir búsqueda →</a>' +
+    '</div>';
+}
+
+renderCityTabs();
+renderCityLinks(CITIES[0].id);
+
+document.getElementById('city-tabs').addEventListener('click', (e)=>{
+  const tab = e.target.closest('.city-tab');
+  if(!tab) return;
+  document.querySelectorAll('.city-tab').forEach(t=>t.setAttribute('aria-selected','false'));
+  tab.setAttribute('aria-selected','true');
+  renderCityLinks(tab.dataset.city);
 });
+
+/* --- Guardar expediente en este navegador --- */
+const EXPEDIENTE_STORAGE_KEY = 'citypaws_expediente_v1';
+const EXPEDIENTE_FIELD_IDS = ['petName','species','breed','age','weight','neutered','vaccines','history','vet','reference','hasRC','rcCompany','rcPolicy','training','hasCartilla','ownerName','city'];
+
+function collectExpedienteData(){
+  const data = {};
+  EXPEDIENTE_FIELD_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    data[id] = (el.type === 'checkbox') ? el.checked : el.value;
+  });
+  data.petPhotoDataUrl = petPhotoDataUrl || '';
+  return data;
+}
+
+function applyExpedienteData(data){
+  EXPEDIENTE_FIELD_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el || !(id in data)) return;
+    if(el.type === 'checkbox') el.checked = !!data[id];
+    else el.value = data[id];
+  });
+  if(data.petPhotoDataUrl){
+    petPhotoDataUrl = data.petPhotoDataUrl;
+    document.getElementById('photoHint').textContent = 'Foto cargada desde tu expediente guardado.';
+  }
+  updateDoc();
+}
+
+function saveExpedienteLocal(){
+  try{
+    localStorage.setItem(EXPEDIENTE_STORAGE_KEY, JSON.stringify(collectExpedienteData()));
+  }catch(e){ /* localStorage no disponible: no bloquea el uso de la herramienta */ }
+}
+
+function checkSavedExpediente(){
+  try{
+    const raw = localStorage.getItem(EXPEDIENTE_STORAGE_KEY);
+    if(raw) document.getElementById('savedBanner').style.display = 'flex';
+  }catch(e){ /* localStorage no disponible */ }
+}
+
+document.getElementById('loadSavedBtn').addEventListener('click', ()=>{
+  try{
+    const raw = localStorage.getItem(EXPEDIENTE_STORAGE_KEY);
+    if(raw) applyExpedienteData(JSON.parse(raw));
+  }catch(e){ /* ignorar */ }
+  document.getElementById('savedBanner').style.display = 'none';
+});
+
+document.getElementById('dismissSavedBtn').addEventListener('click', ()=>{
+  document.getElementById('savedBanner').style.display = 'none';
+});
+
+document.querySelectorAll('#tool1 input, #tool1 select, #tool1 textarea').forEach(el=>{
+  el.addEventListener('input', saveExpedienteLocal);
+  el.addEventListener('change', saveExpedienteLocal);
+});
+
+checkSavedExpediente();
+
+/* --- Tool 3: copiar cláusula --- */
+const copyClauseBtn = document.getElementById('copyClauseBtn');
+if(copyClauseBtn){
+  copyClauseBtn.addEventListener('click', ()=>{
+    const text = document.getElementById('clause-text').innerText;
+    const msg = document.getElementById('clauseCopiedMsg');
+    function showCopied(){
+      msg.style.display = 'inline';
+      setTimeout(()=>{ msg.style.display = 'none'; }, 2500);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showCopied).catch(()=>{
+        msg.textContent = 'No se pudo copiar automáticamente. Selecciona el texto y usa Ctrl/Cmd+C.';
+        showCopied();
+      });
+    } else {
+      msg.textContent = 'Selecciona el texto y usa Ctrl/Cmd+C para copiarlo.';
+      showCopied();
+    }
+  });
+}
 
 /* --- Plausible analytics events --- */
 if(window.plausible){
-  document.querySelectorAll('a.go').forEach(a=>{
-    a.addEventListener('click', ()=>{
-      const portal = a.closest('.link-card')?.querySelector('.portal')?.textContent?.trim().toLowerCase() || 'unknown';
-      plausible('outbound_search', {props:{portal}});
-    });
+  document.addEventListener('click', (e)=>{
+    const a = e.target.closest('a.go');
+    if(!a) return;
+    const portal = a.closest('.link-card')?.querySelector('.portal')?.textContent?.trim().toLowerCase() || 'unknown';
+    plausible('outbound_search', {props:{portal}});
   });
   const tool1El = document.querySelector('#tool1 .tool-head') || document.getElementById('tool1');
   if(tool1El && 'IntersectionObserver' in window){
