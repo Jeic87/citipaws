@@ -350,6 +350,25 @@ section.tool{ margin-bottom:64px; }
           <label for="vet">Contacto veterinario</label>
           <input type="text" id="vet" value="Clínica San Bernardo, Madrid">
         </div>
+        <div class="field">
+          <label for="reference">Referencia del casero anterior</label>
+          <input type="text" id="reference" placeholder="Teléfono o email para verificar el buen comportamiento" value="+34 611 222 333 (antiguo casero, Chamberí)">
+        </div>
+        <div class="field">
+          <div class="checks">
+            <label><input type="checkbox" id="hasRC" checked> Dispone de Seguro de RC obligatorio para perros (Ley de Bienestar Animal)</label>
+          </div>
+          <div class="row2" id="rcDetails" style="margin-top:10px;">
+            <div class="field">
+              <label for="rcCompany">Compañía aseguradora</label>
+              <input type="text" id="rcCompany" value="Mapfre">
+            </div>
+            <div class="field">
+              <label for="rcPolicy">Nº de póliza</label>
+              <input type="text" id="rcPolicy" value="ES-583920">
+            </div>
+          </div>
+        </div>
         <div class="row2">
           <div class="field">
             <label for="ownerName">Nombre del inquilino</label>
@@ -381,6 +400,7 @@ section.tool{ margin-bottom:64px; }
               <dt>Peso</dt><dd id="out-weight">18 kg</dd>
               <dt>Esterilizado/a</dt><dd id="out-neutered">Sí</dd>
               <dt>Sanidad</dt><dd id="out-vaccines">Vacunas al día</dd>
+              <dt>Seguro RC</dt><dd id="out-rc">—</dd>
             </dl>
           </div>
 
@@ -396,6 +416,7 @@ section.tool{ margin-bottom:64px; }
               <dt>Veterinario</dt><dd id="out-vet">Clínica San Bernardo, Madrid</dd>
               <dt>Inquilino</dt><dd id="out-owner">Laura Gómez</dd>
               <dt>Ciudad</dt><dd id="out-city">Madrid</dd>
+              <dt>Referencia anterior</dt><dd id="out-reference">—</dd>
             </dl>
           </div>
 
@@ -484,6 +505,13 @@ function updateDoc(){
   document.getElementById('out-vaccines').textContent = val('vaccines') === 'Al día' ? 'Vacunas al día' : 'Vacunación pendiente';
   document.getElementById('out-history').textContent = val('history') || '—';
   document.getElementById('out-vet').textContent = val('vet') || '—';
+  document.getElementById('out-reference').textContent = val('reference') || 'No indicada';
+  const hasRC = document.getElementById('hasRC').checked;
+  const rcDetails = document.getElementById('rcDetails');
+  if(rcDetails) rcDetails.style.display = hasRC ? 'grid' : 'none';
+  document.getElementById('out-rc').textContent = hasRC
+    ? ('Sí' + (val('rcCompany') ? ' — ' + val('rcCompany') : '') + (val('rcPolicy') ? ' (Póliza ' + val('rcPolicy') + ')' : ''))
+    : 'No indicado';
   document.getElementById('out-owner').textContent = val('ownerName') || '—';
   document.getElementById('out-city').textContent = val('city') || '—';
 
