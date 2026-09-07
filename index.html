@@ -197,6 +197,9 @@ section.tool{ margin-bottom:64px; }
 .doc-title{ font-family:'IBM Plex Mono'; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
 .doc-petname{ font-size:1.5rem; margin-top:4px; }
 .doc-sub{ color:var(--muted); font-size:.9rem; margin-top:2px; }
+.doc-photo-wrap{ width:64px; height:64px; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:var(--paper); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.doc-photo{ width:100%; height:100%; object-fit:cover; display:none; }
+.doc-photo-placeholder{ font-size:1.6rem; opacity:.35; }
 .stamp{
   font-family:'IBM Plex Mono'; font-size:.62rem; letter-spacing:.06em; text-transform:uppercase;
   color:var(--stamp); border:1.5px solid var(--stamp); border-radius:999px; padding:6px 12px;
@@ -298,6 +301,11 @@ section.tool{ margin-bottom:64px; }
           <label for="petName">Nombre de la mascota</label>
           <input type="text" id="petName" value="Rocco">
         </div>
+        <div class="field">
+          <label for="petPhoto">Foto de la mascota (opcional)</label>
+          <input type="file" id="petPhoto" accept="image/*">
+          <div class="save-note" id="photoHint">Se procesa en tu navegador y se comprime automáticamente. No se sube a ningún servidor.</div>
+        </div>
         <div class="row2">
           <div class="field">
             <label for="species">Especie</label>
@@ -385,10 +393,16 @@ section.tool{ margin-bottom:64px; }
       <div class="doc-wrap">
         <div class="doc" id="doc">
           <div class="doc-head">
-            <div>
-              <div class="doc-title">Expediente de convivencia</div>
-              <div class="doc-petname" id="out-name">Rocco</div>
-              <div class="doc-sub" id="out-sub">Perro · Mestizo, tamaño mediano</div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="doc-photo-wrap">
+                <span class="doc-photo-placeholder" id="out-photo-placeholder">🐾</span>
+                <img class="doc-photo" id="out-photo" alt="Foto de la mascota">
+              </div>
+              <div>
+                <div class="doc-title">Expediente de convivencia</div>
+                <div class="doc-petname" id="out-name">Rocco</div>
+                <div class="doc-sub" id="out-sub">Perro · Mestizo, tamaño mediano</div>
+              </div>
             </div>
             <div class="stamp">Apto para alquiler</div>
           </div>
@@ -529,12 +543,56 @@ function updateDoc(){
     li.style.listStyle = 'none';
     traitsList.appendChild(li);
   }
+
+  const outPhoto = document.getElementById('out-photo');
+  const outPhotoPlaceholder = document.getElementById('out-photo-placeholder');
+  if(petPhotoDataUrl){
+    outPhoto.src = petPhotoDataUrl;
+    outPhoto.style.display = 'block';
+    outPhotoPlaceholder.style.display = 'none';
+  } else {
+    outPhoto.style.display = 'none';
+    outPhotoPlaceholder.style.display = 'block';
+  }
 }
 document.querySelectorAll('#tool1 input, #tool1 select, #tool1 textarea').forEach(el=>{
   el.addEventListener('input', updateDoc);
   el.addEventListener('change', updateDoc);
 });
 updateDoc();
+
+let petPhotoDataUrl = '';
+const PET_PHOTO_MAX_DIM = 400;
+const PET_PHOTO_MAX_UPLOAD_MB = 15;
+document.getElementById('petPhoto').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  const hint = document.getElementById('photoHint');
+  if(!file) return;
+  if(file.size > PET_PHOTO_MAX_UPLOAD_MB * 1024 * 1024){
+    hint.textContent = 'La imagen pesa demasiado (máx ' + PET_PHOTO_MAX_UPLOAD_MB + 'MB). Elige otra foto.';
+    hint.style.color = 'var(--stamp)';
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = new Image();
+    img.onload = function(){
+      let w = img.width, h = img.height;
+      if(w >= h && w > PET_PHOTO_MAX_DIM){ h = Math.round(h * PET_PHOTO_MAX_DIM / w); w = PET_PHOTO_MAX_DIM; }
+      else if(h > w && h > PET_PHOTO_MAX_DIM){ w = Math.round(w * PET_PHOTO_MAX_DIM / h); h = PET_PHOTO_MAX_DIM; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      petPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      hint.textContent = 'Foto cargada y comprimida en tu navegador — no se sube a ningún servidor.';
+      hint.style.color = 'var(--muted)';
+      updateDoc();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
 
 document.querySelectorAll('.city-tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
