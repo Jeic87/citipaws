@@ -593,6 +593,8 @@ section.tool{ margin-bottom:64px; }
 
 <script>
 let petPhotoDataUrl = '';
+let progress50Sent = false;
+let progress100Sent = false;
 const PROGRESS_FIELD_IDS = ['petName','breed','age','weight','history','vet','reference','ownerName','city'];
 function updateDoc(){
   const val = id => document.getElementById(id).value;
@@ -769,11 +771,13 @@ function applyExpedienteData(data){
     document.getElementById('photoHint').textContent = 'Foto cargada desde tu expediente guardado.';
   }
   updateDoc();
+  if(window.plausible) plausible('expediente_load');
 }
 
 function saveExpedienteLocal(){
   try{
     localStorage.setItem(EXPEDIENTE_STORAGE_KEY, JSON.stringify(collectExpedienteData()));
+    if(window.plausible) plausible('expediente_save');
   }catch(e){ /* localStorage no disponible: no bloquea el uso de la herramienta */ }
 }
 
@@ -817,6 +821,10 @@ function updateExpedienteProgress(){
   const total = ids.length;
   const filled = ids.filter(isFieldFilled).length;
   const pct = total ? Math.round((filled / total) * 100) : 0;
+  if(window.plausible){
+    if(pct >= 50 && !progress50Sent){ progress50Sent = true; plausible('expediente_progress_50'); }
+    if(pct >= 100 && !progress100Sent){ progress100Sent = true; plausible('expediente_progress_100'); }
+  }
   const label = document.getElementById('expedienteProgressLabel');
   const count = document.getElementById('expedienteProgressCount');
   const fill = document.getElementById('expedienteProgressFill');
@@ -847,7 +855,10 @@ if(copyClauseBtn){
       setTimeout(()=>{ msg.style.display = 'none'; }, 2500);
     }
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(showCopied).catch(()=>{
+      navigator.clipboard.writeText(text).then(()=>{
+        showCopied();
+        if(window.plausible) plausible('clause_copy', {props:{species: (document.getElementById('species').value || 'mascota').toLowerCase()}});
+      }).catch(()=>{
         msg.textContent = 'No se pudo copiar automáticamente. Selecciona el texto y usa Ctrl/Cmd+C.';
         showCopied();
       });
